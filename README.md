@@ -2,7 +2,9 @@
 
 This small Node.js application was created with the intent of improving UCSD Undergraduate Economics Society's (UES) marketting and advertising. The marketting committee was previously approaching advertising and flyering without data or reason to support their methodology. Hopefully, this application will reduce inefficiency and waste, and increase the effectiveness of the team's efforts.
 
-After fetching real-time course data, the application delivers an easy-to-understand, interactive heatmap of the UCSD campus with classrooms and lecture halls highlighted by students enrolled and students possibly enrolled. On the sidebar is a list of classrooms and their potential flow of students per week. Obviously, the marketting team should focus their advertisements on these highly populated classrooms. 
+After fetching real-time course data, the application delivers an easy-to-understand, interactive heatmap of the UCSD campus with classrooms and lecture halls highlighted by students enrolled and students possibly enrolled. On the sidebar is a list of classrooms and their potential flow of students per week. Obviously, the marketting team should focus their advertisements on these highly populated classrooms.
+
+![Operational Screenshot](/UES%20Ad%20Targetting.png?raw=true "Operational Screenshot")
 
 ## Installation
 
