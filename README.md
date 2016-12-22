@@ -21,6 +21,8 @@ Built by myself ([@alex005](https://github.com/Alex005))
 ## To-do
 
 - [ ] Optimize and review code
+- [ ] Migrate location coordinates into a separate file
+- [ ] Clean coordinates and add more buildings
 
 ## License
 
