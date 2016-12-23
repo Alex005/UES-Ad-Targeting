@@ -1,14 +1,14 @@
 ## UCSD Undergraduate Economics Society Advertisement Targetting
 
-This small Node.js application was created with the intent of improving UCSD Undergraduate Economics Society's (UES) marketting and advertising. The marketting committee was previously approaching advertising and flyering without data or reason to support their methodology. Hopefully, this application will reduce inefficiency and waste, and increase the effectiveness of the team's efforts.
+This small Node.js application was created with the intent of improving UCSD Undergraduate Economics Society's (UES) marketing and advertising. The marketing committee was previously approaching advertising and flyering without data or reason to support their methodology. Hopefully, this application will reduce inefficiency and waste, and increase the effectiveness of the team's efforts.
 
-After fetching real-time course data, the application delivers an easy-to-understand, interactive heatmap of the UCSD campus with classrooms and lecture halls highlighted by students enrolled and students possibly enrolled. On the sidebar is a list of classrooms and their potential flow of students per week. Obviously, the marketting team should focus their advertisements on these highly populated classrooms.
+After fetching real-time course data, the application delivers an easy-to-understand, interactive heatmap of the UCSD campus with classrooms and lecture halls highlighted by students enrolled and students possibly enrolled (waitlisted and open seats). On the sidebar is a list of classrooms and their potential flow of students per week. Obviously, the marketing team should focus their advertisements on these highly populated classrooms.
 
 ![Operational Screenshot](/UES%20Ad%20Targetting.png?raw=true "Operational Screenshot")
 
 ## Installation
 
-Setup requires <code>Node.js</code>, <code>express</code>, <code>socket.io</code>, and <code>socsjs</code>. Within <code>index.js</code>, variables may be altered to choose which year, quarter, and department should be targetted. At this moment, classrooms must be located manually and hard-coded into the program.
+Setup requires <code>Node.js</code>, <code>express</code>, <code>socket.io</code>, and <code>socsjs</code> (additionally, <code>winston</code> is used to logging). Within <code>index.js</code>, variables may be altered to choose which year, quarter, and department should be targetted. At this moment, classrooms must be located manually and hard-coded into the program.
 
 ## API Reference
 
