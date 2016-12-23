@@ -35,54 +35,53 @@ var roomCoordinates = {
     'WLH 2204': [333, 425]
 }
 
-var gradient = ['#dc143c', '#e9613b', '#f39237', '#fabe2e', '#feea1b', '#e6f100', '#b5d400', '#85b800', '#529c00', '#008000'];
-var minRadius = 8;
-var maxRadius = 28;
-var mapAlpha = 0.4;
 var socket = io();
 
-map = document.getElementById('map');
-canvas = document.getElementById('canv');
-canvas.height = map.height;
-canvas.width = map.height;
-var context = canvas.getContext('2d');
-context.globalAlpha = mapAlpha;
-
-var maxStudents = 0;
-
-socket.on('locations', function(roomInfo) {
-    var valExtract = Object.keys(roomInfo).map(function(key) {
-        return roomInfo[key];
+window.onload = function() {
+    map = document.getElementById('map');
+    wrapper = document.getElementById('heatmapContainerWrapper');
+    wrapper.style.height = "700px";
+    wrapper.style.width = "700px";
+    var heatmap = h337.create({
+        maxOpacity: .8,
+        container: document.getElementById('heatmapContainer')
     });
-    listRoomInfo(roomInfo, Math.max.apply(null, valExtract));
-    canvas.addEventListener("click", findClosestRoom, false);
-});
+    window.h = heatmap;
 
-function listRoomInfo(roomInfo, maxStudents) {
-    for (var room in roomInfo) {
-        if (roomInfo.hasOwnProperty(room)) {
-            if (!roomCoordinates.hasOwnProperty(room)) {
-                console.log(room + ' does not have any coordinates');
+    socket.on('locations', function(roomInfo) {
+        points = [];
+        for (var room in roomInfo) {
+            if (roomInfo.hasOwnProperty(room)) {
+                if (!roomCoordinates.hasOwnProperty(room)) {
+                    console.log(room + ' does not have any coordinates');
+                }
+                var x = toScale(roomCoordinates[room][0] - 5);
+                var y = toScale(roomCoordinates[room][1] - 15);
+
+                points.push({
+                    x: x,
+                    y: y,
+                    value: roomInfo[room]
+                });
+
+                var pTag = document.createElement("P");
+                var innerText = document.createTextNode(room + ' - ' + roomInfo[room]);
+                pTag.appendChild(innerText);
+
+                document.getElementById("classes").appendChild(pTag);
             }
-            var radiusRatio = roomInfo[room] / maxStudents;
-            var radius = minRadius + (radiusRatio * (maxRadius - minRadius));
-            var x = toScale(roomCoordinates[room][0] - 5);
-            var y = toScale(roomCoordinates[room][1] - 15);
-            var color = gradient[Math.round(radiusRatio * gradient.length) - 1];
-
-            context.beginPath();
-            context.arc(x, y, radius, 0, 2 * Math.PI, false);
-            context.fillStyle = color;
-            context.fill();
-
-            var pTag = document.createElement("P");
-            var innerText = document.createTextNode(room + ' - ' + roomInfo[room]);
-            pTag.appendChild(innerText);
-
-            document.getElementById("classes").appendChild(pTag);
         }
-    }
-}
+        var valExtract = Object.keys(roomInfo).map(function(key) {
+            return roomInfo[key];
+        });
+        var data = {
+            max: Math.max.apply(null, valExtract),
+            data: points
+        };
+        heatmap.setData(data);
+        wrapper.addEventListener("click", findClosestRoom, false);
+    });
+};
 
 function findClosestRoom(event) {
     var distances = distFormula(event.clientX, event.clientY);
@@ -116,5 +115,5 @@ function distFormula(x, y) {
 }
 
 function toScale(num) {
-    return num / 775 * map.width;
+    return num / 775 * 700;
 }
