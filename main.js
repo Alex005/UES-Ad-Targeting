@@ -34,34 +34,44 @@ var roomCoordinates = {
     'WLH 2114': [331, 426],
     'WLH 2204': [333, 425]
 }
+var coordsFrom = 780;
 
 var socket = io();
+var canvas = {};
 
 window.onload = function() {
-    map = document.getElementById('map');
+    var winHeight = window.innerHeight;
+    var minRadius = 5;
+    var maxRadius = 50;
+
     wrapper = document.getElementById('heatmapContainerWrapper');
-    wrapper.style.height = "700px";
-    wrapper.style.width = "700px";
+
     var heatmap = h337.create({
-        maxOpacity: .8,
+        maxOpacity: .75,
         container: document.getElementById('heatmapContainer')
     });
+    canvas = document.getElementsByTagName('canvas')[0];
+    canvas.width = winHeight;
+    canvas.height = winHeight;
     window.h = heatmap;
 
     socket.on('locations', function(roomInfo) {
+        var valExtract = Object.keys(roomInfo).map(function(key) {
+            return roomInfo[key];
+        });
+        var maxStudents = Math.max.apply(null, valExtract);
         points = [];
         for (var room in roomInfo) {
             if (roomInfo.hasOwnProperty(room)) {
                 if (!roomCoordinates.hasOwnProperty(room)) {
                     console.log(room + ' does not have any coordinates');
                 }
-                var x = toScale(roomCoordinates[room][0] - 5);
-                var y = toScale(roomCoordinates[room][1] - 15);
 
                 points.push({
-                    x: x,
-                    y: y,
-                    value: roomInfo[room]
+                    x: Math.floor((roomCoordinates[room][0] - 5) * (winHeight / coordsFrom)),
+                    y: Math.floor((roomCoordinates[room][1] - 15) * (winHeight / coordsFrom)),
+                    value: roomInfo[room],
+                    radius: minRadius + (maxRadius - minRadius) * (roomInfo[room] / maxStudents)
                 });
 
                 var pTag = document.createElement("P");
@@ -71,15 +81,13 @@ window.onload = function() {
                 document.getElementById("classes").appendChild(pTag);
             }
         }
-        var valExtract = Object.keys(roomInfo).map(function(key) {
-            return roomInfo[key];
-        });
+
         var data = {
-            max: Math.max.apply(null, valExtract),
+            max: maxStudents,
             data: points
         };
         heatmap.setData(data);
-        wrapper.addEventListener("click", findClosestRoom, false);
+        canvas.addEventListener("click", findClosestRoom, false);
     });
 };
 
@@ -112,8 +120,4 @@ function distFormula(x, y) {
         }
     }
     return distances;
-}
-
-function toScale(num) {
-    return num / 775 * 700;
 }

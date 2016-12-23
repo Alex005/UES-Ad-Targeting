@@ -13,20 +13,6 @@
                 height: 100%;
             }
 
-            #map {
-                position: absolute;
-                height: 100%;
-                top: 0;
-                left: 0;
-            }
-
-            #canv {
-                position: absolute;
-                top: 0;
-                left: 0;
-                z-index: 999;
-            }
-
             #label,
             #classes {
                 position: absolute;
@@ -43,18 +29,26 @@
             }
 
             #heatmapContainerWrapper {
-                background: rgba(0, 0, 0, .1);
+                background-image: url(CampusMap.png);
+                background-size: contain;
+                background-repeat: no-repeat;
+                height: 100%;
+                margin: 0;
             }
 
             #heatmapContainer {
                 width: 100%;
                 height: 100%;
+                margin: 0;
+            }
+
+            .heatmap-canvas {
+                position: relative !important;
             }
         </style>
     </head>
 
     <body>
-        <img id="map" src="CampusMap.png" />
         <div id="heatmapContainerWrapper">
             <div id="heatmapContainer">
 
