@@ -1,4 +1,4 @@
-var coordinates = {
+var roomCoordinates = {
     'APM 2301': [148, 476],
     'CENTR 101': [252, 531],
     'CENTR 105': [250, 519],
@@ -34,75 +34,87 @@ var coordinates = {
     'WLH 2114': [331, 426],
     'WLH 2204': [333, 425]
 }
+
 var gradient = ['#dc143c', '#e9613b', '#f39237', '#fabe2e', '#feea1b', '#e6f100', '#b5d400', '#85b800', '#529c00', '#008000'];
 var minRadius = 8;
-var maxRadius = 30;
+var maxRadius = 28;
+var mapAlpha = 0.4;
 var socket = io();
 
 map = document.getElementById('map');
-canv = document.getElementById('canv');
-canv.height = map.height;
-canv.width = map.height;
-canv.addEventListener("click", findClosest, false);
+canvas = document.getElementById('canv');
+canvas.height = map.height;
+canvas.width = map.height;
+var context = canvas.getContext('2d');
+context.globalAlpha = mapAlpha;
 
-var context = canv.getContext('2d');
-context.globalAlpha = 0.4;
+var maxStudents = 0;
 
-socket.on('locations', function(locations) {
-    delete locations['TBA'];
-    var valExtract = Object.keys(locations).map(function(key) {
-        return locations[key];
+socket.on('locations', function(roomInfo) {
+    var valExtract = Object.keys(roomInfo).map(function(key) {
+        return roomInfo[key];
     });
-    var maxStudents = Math.max.apply(null, valExtract);
-
-    for (var key in locations) {
-        if (locations.hasOwnProperty(key)) {
-            if (!coordinates.hasOwnProperty(key)) {
-                console.log(key, 'does not have coordinates')
-            }
-            var radiusRatio = locations[key] / maxStudents;
-            var radius = minRadius + (radiusRatio * (maxRadius - minRadius))
-            context.beginPath();
-            context.arc(toScale(coordinates[key][0] - 5), toScale(coordinates[key][1] - 15), radius, 0, 2 * Math.PI, false);
-            context.fillStyle = gradient[Math.round(radiusRatio * gradient.length) - 1];
-            context.fill();
-
-            var p = document.createElement("P");
-            var t = document.createTextNode(key + ' - ' + locations[key]);
-            p.appendChild(t);
-            document.getElementById("classes").appendChild(p);
-        }
-    }
+    listRoomInfo(roomInfo, Math.max.apply(null, valExtract));
+    canvas.addEventListener("click", findClosestRoom, false);
 });
 
-function findClosest(e) {
-    var distances = d(e.clientX, e.clientY);
+function listRoomInfo(roomInfo, maxStudents) {
+    for (var room in roomInfo) {
+        if (roomInfo.hasOwnProperty(room)) {
+            if (!roomCoordinates.hasOwnProperty(room)) {
+                console.log(room + ' does not have any coordinates');
+            }
+            var radiusRatio = roomInfo[room] / maxStudents;
+            var radius = minRadius + (radiusRatio * (maxRadius - minRadius));
+            var x = toScale(roomCoordinates[room][0] - 5);
+            var y = toScale(roomCoordinates[room][1] - 15);
+            var color = gradient[Math.round(radiusRatio * gradient.length) - 1];
+
+            context.beginPath();
+            context.arc(x, y, radius, 0, 2 * Math.PI, false);
+            context.fillStyle = color;
+            context.fill();
+
+            var pTag = document.createElement("P");
+            var innerText = document.createTextNode(room + ' - ' + roomInfo[room]);
+            pTag.appendChild(innerText);
+
+            document.getElementById("classes").appendChild(pTag);
+        }
+    }
+}
+
+function findClosestRoom(event) {
+    var distances = distFormula(event.clientX, event.clientY);
 
     if (distances.length == 0) {
         document.getElementById('label').innerHTML = "Unknown";
     } else {
-        var min = distances[0][1];
         var selectLocation = distances[0][0];
-        distances.forEach(function(val) {
-            if (val[1] < min) {
-                min = val[1];
-                selectLocation = val[0];
+        var minimum = distances[0][1];
+        distances.forEach(function(distance) {
+            if (distance[1] < minimum) {
+                minimum = distance[1];
+                selectLocation = distance[0];
             }
         });
         document.getElementById('label').innerHTML = selectLocation;
     }
 }
 
-function d(x, y) {
+function distFormula(x, y) {
     var distances = [];
-    for (var key in coordinates) {
-        var rawDistance = Math.pow((coordinates[key][0] - x), 2) + Math.pow((coordinates[key][1] - y), 2);
-        if (rawDistance < 750) {
-            distances.push([key, rawDistance]);
+    var clickReach = 750;
+
+    for (var room in roomCoordinates) {
+        var rawDistance = Math.pow((roomCoordinates[room][0] - x), 2) + Math.pow((roomCoordinates[room][1] - y), 2);
+        if (rawDistance < clickReach) {
+            distances.push([room, rawDistance]);
         }
     }
     return distances;
 }
-function toScale (num) {
-  return num / 775 * map.width;
+
+function toScale(num) {
+    return num / 775 * map.width;
 }

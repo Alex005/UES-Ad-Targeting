@@ -66,6 +66,7 @@ io.on('connection', function(socket) {
                 }
             });
         });
+        delete roomInfo['TBA'];
         io.emit('locations', roomInfo);
 
     }).catch(function(err) {
