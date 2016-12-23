@@ -1,34 +1,53 @@
+<!DOCTYPE html>
 <html>
 
     <head>
-        <title>UES Heatmap</title>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>UES Ad Targetting Heatmap</title>
         <style>
+            body,
+            html {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+            }
+
+            #map {
+                position: absolute;
+                height: 100%;
+                top: 0;
+                left: 0;
+            }
+
             #canv {
                 position: absolute;
                 top: 0;
                 left: 0;
             }
 
-            #label {
-                display: inline-block;
+            #label,
+            #classes {
                 position: absolute;
+                width: 200px;
+                right: 200px;
+            }
+
+            #label {
                 top: 50px;
             }
 
             #classes {
-                display: inline-block;
-                position: absolute;
                 top: 100px;
             }
         </style>
     </head>
 
-    <body style="margin:0;padding:0;">
-        <img src="CampusMap.png" style="height:100%;" id="map" />
+    <body>
+        <img id="map" src="CampusMap.png" />
         <canvas id="canv"></canvas>
         <h2 id="label">Unknown</h2>
-        <div id="classes">
-        </div>
+        <div id="classes"></div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
         <script src="main.js"></script>
     </body>
