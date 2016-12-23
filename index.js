@@ -1,11 +1,21 @@
-var port = 8000;
-var serverUrl = "127.0.0.1";
-
 var express = require("express");
 var app = express();
 var http = require("http").Server(app);
 var io = require('socket.io')(http);
 var socsjs = require('socsjs');
+var winston = require('winston');
+
+winston.configure({
+    level: 'error',
+    transports: [
+        new(winston.transports.File)({
+            filename: 'UESAT_logs.log'
+        })
+    ]
+});
+
+var serverPort = 8000;
+var serverUrl = "127.0.0.1";
 
 var quarter = 'WI17';
 var dept = 'ECON';
@@ -19,11 +29,14 @@ app.get("/", function(req, res) {
 });
 
 io.on('connection', function(socket) {
-    locations = {};
+    var locations = {};
+
     socsjs.searchDepartment(quarter, dept, timeout, undergrad).then(function(result) {
+
         result.forEach(function(val) {
             var lectureHall = null;
             var lectureSeats = 0;
+
             val['sections'].forEach(function(section, index) {
                 var curLocation = section.location;
                 var curSeats = section.seatLimit - section.openSeats + section.waitlistSize;
@@ -31,35 +44,33 @@ io.on('connection', function(socket) {
 
                 if (!(curLocation in locations) && (curType == "lecture" || curType == "discussion")) {
                     locations[curLocation] = 0;
-                    //console.log('\nnew location:', curLocation);
+                    winston.info('add new location: %s', curLocation);
                 }
                 if (curType == "lecture") {
                     lectureHall = curLocation;
-                    //console.log('\nset lecture hall for', val['name'], ' to,', lectureHall)
+                    winston.info('set classroom for %s as %s', val['name'], lectureHall);
                     if (curSeats > 0) {
                         locations[curLocation] += curSeats;
-                        // console.log(val['name'], ' has no discussions, add', curSeats)
+                        winston.info('%s has no discussions, add %d lecture only seats', val['name'], curSeats);
                     }
-                }
-                if (curType == "discussion") {
+                } else if (curType == "discussion") {
                     locations[curLocation] += curSeats;
-                    // console.log('new discussion for', val['name'], ' at,', curLocation, ' with seats:', curSeats);
+                    winston.info('new discussion for %s with %d seats at %s', val['name'], curSeats, curLocation);
                     if (lectureHall) {
                         locations[lectureHall] += curSeats;
                         lectureSeats += curSeats;
                     }
-                }
-                if (curType == "final") {
-                    // console.log('lecture for', val['name'], ' gets', lectureSeats, ' seats added');
+                } else if (curType == "final") {
                     lectureHall = null;
                     lectureSeats = 0;
                 }
             });
         });
         io.emit('locations', locations);
+
     }).catch(function(err) {
-        console.log('Error:',err);
+        winston.error(err)
     });
 });
 
-http.listen(port, serverUrl);
+http.listen(serverPort, serverUrl);
