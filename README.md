@@ -21,7 +21,7 @@ Built by myself ([@alex005](https://github.com/Alex005))
 ## To-do
 
 - [ ] Optimize and review code
-- [ ] Migrate location coordinates into a separate file
+- [x] Migrate location coordinates into a separate file
 - [ ] Clean coordinates and add more buildings
 - [ ] Append student num to the clicked building
 - [ ] Click should prioritize the most student filled building
