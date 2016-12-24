@@ -1,43 +1,6 @@
-var roomCoordinates = {
-    'APM 2301': [148, 476],
-    'CENTR 101': [252, 531],
-    'CENTR 105': [250, 519],
-    'CENTR 109': [250, 518],
-    'CENTR 113': [256, 509],
-    'CENTR 115': [250, 519],
-    'CENTR 119': [260, 509],
-    'CENTR 214': [257, 509],
-    'CENTR 216': [257, 509],
-    'CENTR 222': [251, 517],
-    'CSB 001': [189, 429],
-    'CSB 002': [187, 431],
-    'CSB 005': [198, 432],
-    'HSS 1330': [129, 497],
-    'LEDDN AUD': [131, 485],
-    'MANDE B-210': [189, 516],
-    'PCYNH 106': [340, 504],
-    'PCYNH 109': [340, 505],
-    'PCYNH 121': [341, 503],
-    'PCYNH 122': [342, 502],
-    'PETER 102': [171, 445],
-    'PETER 103': [172, 445],
-    'PETER 104': [172, 445],
-    'PETER 110': [167, 447],
-    'RBC AUD': [154, 304],
-    'SEQUO 147': [149, 387],
-    'SEQUO 244': [149, 386],
-    'SOLIS 104': [186, 414],
-    'SOLIS 107': [186, 414],
-    'TM102 1': [197, 402],
-    'WLH 2001': [332, 424],
-    'WLH 2005': [329, 426],
-    'WLH 2114': [331, 426],
-    'WLH 2204': [333, 425]
-}
-var coordsFrom = 780;
-
 var socket = io();
 var canvas = {};
+var roomCoordinates = {};
 
 window.onload = function() {
     var winHeight = window.innerHeight;
@@ -55,7 +18,9 @@ window.onload = function() {
     canvas.height = winHeight;
     window.h = heatmap;
 
-    socket.on('locations', function(roomInfo) {
+    socket.on('locations', function(data) {
+      roomCoordinates = data[0];
+      var roomInfo = data[1];
         var valExtract = Object.keys(roomInfo).map(function(key) {
             return roomInfo[key];
         });
@@ -68,8 +33,8 @@ window.onload = function() {
                 }
 
                 points.push({
-                    x: Math.floor((roomCoordinates[room][0] - 5) * (winHeight / coordsFrom)),
-                    y: Math.floor((roomCoordinates[room][1] - 15) * (winHeight / coordsFrom)),
+                    x: Math.floor(roomCoordinates[room][0] * (winHeight+5)),
+                    y: Math.floor(roomCoordinates[room][1] * winHeight),
                     value: roomInfo[room],
                     radius: minRadius + (maxRadius - minRadius) * (roomInfo[room] / maxStudents)
                 });
@@ -87,7 +52,7 @@ window.onload = function() {
             data: points
         };
         heatmap.setData(data);
-        canvas.addEventListener("click", findClosestRoom, false);
+        canvas.addEventListener("mouseup", findClosestRoom, false);
     });
 };
 

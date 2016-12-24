@@ -3,10 +3,12 @@ var app = express();
 var http = require("http").Server(app);
 var io = require('socket.io')(http);
 var socsjs = require('socsjs');
+var csv = require('csv-parser');
+var fs = require('fs');
 var winston = require('winston');
 
 winston.configure({
-    level: 'error',
+    level: 'info',
     transports: [
         new(winston.transports.File)({
             filename: 'UESAT_logs.log'
@@ -27,11 +29,13 @@ app.use(express.static('./'));
 app.get("/", function(req, res) {
     res.sendFile("index.html");
 });
-
 io.on('connection', function(socket) {
+    winston.info('connect');
     var roomInfo = {};
 
     socsjs.searchDepartment(quarter, dept, timeout, undergrad).then(function(departmentResults) {
+
+        winston.info('search deptartment');
 
         departmentResults.forEach(function(sectionsObj) {
             var lectureHall = null;
@@ -44,18 +48,18 @@ io.on('connection', function(socket) {
 
                 if (!(curLocation in roomInfo) && (curType == "lecture" || curType == "discussion")) {
                     roomInfo[curLocation] = 0;
-                    winston.info('add new location: %s', curLocation);
+                    winston.verbose('add new location: %s', curLocation);
                 }
                 if (curType == "lecture") {
                     lectureHall = curLocation;
-                    winston.info('set classroom for %s as %s', sectionsObj['name'], lectureHall);
+                    winston.verbose('set classroom for %s as %s', sectionsObj['name'], lectureHall);
                     if (curSeats > 0) {
                         roomInfo[curLocation] += curSeats;
-                        winston.info('%s has no discussions, add %d lecture only seats', sectionsObj['name'], curSeats);
+                        winston.verbose('%s has no discussions, add %d lecture only seats', sectionsObj['name'], curSeats);
                     }
                 } else if (curType == "discussion") {
                     roomInfo[curLocation] += curSeats;
-                    winston.info('new discussion for %s with %d seats at %s', sectionsObj['name'], curSeats, curLocation);
+                    winston.verbose('new discussion for %s with %d seats at %s', sectionsObj['name'], curSeats, curLocation);
                     if (lectureHall) {
                         roomInfo[lectureHall] += curSeats;
                         lectureSeats += curSeats;
@@ -66,11 +70,23 @@ io.on('connection', function(socket) {
                 }
             });
         });
+        winston.info('sections loaded, load csv');
         delete roomInfo['TBA'];
-        io.emit('locations', roomInfo);
+
+        coordinatesData = {};
+
+        fs.createReadStream('coordinates.csv')
+            .pipe(csv())
+            .on('data', function(data) {
+                coordinatesData[data.room] = [data.x, data.y];
+            })
+            .on('end', function() {
+                winston.info('emit data');
+                io.emit('locations', [coordinatesData, roomInfo]);
+            });
 
     }).catch(function(err) {
-        winston.error(err)
+        winston.error(str(err));
     });
 });
 
