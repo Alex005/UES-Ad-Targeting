@@ -8,7 +8,7 @@ var fs = require('fs');
 var winston = require('winston');
 
 winston.configure({
-    level: 'info',
+    level: 'error',
     transports: [
         new(winston.transports.File)({
             filename: 'UESAT_logs.log'
@@ -21,8 +21,7 @@ var serverUrl = "127.0.0.1";
 
 var quarter = 'WI17';
 var dept = 'ECON';
-var timeout = 7500;
-var undergrad = true;
+var timeout = 5000;
 
 app.use(express.static('./'));
 
@@ -33,7 +32,7 @@ io.on('connection', function(socket) {
     winston.info('connect');
     var roomInfo = {};
 
-    socsjs.searchDepartment(quarter, dept, timeout, undergrad).then(function(departmentResults) {
+    socsjs.searchDepartment(quarter, dept, timeout, true).then(function(departmentResults) {
 
         winston.info('search deptartment');
 
@@ -86,7 +85,7 @@ io.on('connection', function(socket) {
             });
 
     }).catch(function(err) {
-        winston.error(str(err));
+        winston.error('socjs error: ' + err);
     });
 });
 
