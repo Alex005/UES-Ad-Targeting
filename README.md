@@ -4,7 +4,7 @@ This small Node.js application was created with the intent of improving UCSD Und
 
 After fetching real-time course data, the application delivers an easy-to-understand, interactive heatmap of the UCSD campus with classrooms and lecture halls highlighted by students enrolled and students possibly enrolled (waitlisted and open seats). On the sidebar is a list of classrooms and their potential flow of students per week. Obviously, the marketing team should focus their advertisements on these highly populated classrooms.
 
-![Operational Screenshot](/UES%20Ad%20Targetting.png?raw=true "Operational Screenshot")
+![Operational Screenshot](/UES%20Ad%20Targeting.png?raw=true "Operational Screenshot")
 
 ## Installation
 
