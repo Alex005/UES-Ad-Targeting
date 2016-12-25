@@ -23,7 +23,7 @@ Built by myself ([@alex005](https://github.com/Alex005))
 - [ ] Optimize and review code
 - [x] Migrate location coordinates into a separate file
 - [x] Clean coordinates and add more buildings
-- [ ] Append student num to the clicked building
+- [x] Append student num to the clicked building
 - [ ] Click should prioritize the most student filled building
 
 ## License
