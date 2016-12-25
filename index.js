@@ -1,11 +1,12 @@
-var express = require("express");
-var app = express();
-var http = require("http").Server(app);
-var io = require('socket.io')(http);
-var socsjs = require('socsjs');
-var csv = require('csv-parser');
-var fs = require('fs');
-var winston = require('winston');
+"use strict";
+const express = require("express");
+const app = express();
+const http = require("http").Server(app);
+const io = require('socket.io')(http);
+const socsjs = require('socsjs');
+const csv = require('csv-parser');
+const fs = require('fs');
+const winston = require('winston');
 
 winston.configure({
     level: 'error',
@@ -16,49 +17,49 @@ winston.configure({
     ]
 });
 
-var serverPort = 8000;
-var serverUrl = "127.0.0.1";
+const serverPort = 8000;
+const serverUrl = "127.0.0.1";
 
-var quarter = 'WI17';
-var dept = 'ECON';
-var timeout = 5000;
+const quarter = 'WI17';
+const dept = 'ECON';
+const timeout = 5000;
 
 app.use(express.static('./'));
 
-app.get("/", function(req, res) {
+app.get("/", (req, res) => {
     res.sendFile("index.html");
 });
-io.on('connection', function(socket) {
+io.on('connection', socket => {
     winston.info('connect');
-    var roomInfo = {};
+    let roomInfo = {};
 
-    socsjs.searchDepartment(quarter, dept, timeout, true).then(function(departmentResults) {
+    socsjs.searchDepartment(quarter, dept, timeout, true).then(departmentResults => {
 
         winston.info('search deptartment');
 
-        departmentResults.forEach(function(sectionsObj) {
-            var lectureHall = null;
-            var lectureSeats = 0;
+        departmentResults.forEach(sectionsObj => {
+            let lectureHall = null;
+            let lectureSeats = 0;
 
-            sectionsObj['sections'].forEach(function(section) {
-                var curLocation = section.location;
-                var curSeats = section.seatLimit - section.openSeats + section.waitlistSize;
-                var curType = section.type;
+            sectionsObj.sections.forEach(section => {
+                let curLocation = section.location;
+                let curSeats = section.seatLimit - section.openSeats + section.waitlistSize;
+                let curType = section.type;
 
                 if (!(curLocation in roomInfo) && (curType == "lecture" || curType == "discussion")) {
                     roomInfo[curLocation] = 0;
-                    winston.verbose('add new location: %s', curLocation);
+                    winston.verbose(`add new location: ${curLocation}`);
                 }
                 if (curType == "lecture") {
                     lectureHall = curLocation;
-                    winston.verbose('set classroom for %s as %s', sectionsObj['name'], lectureHall);
+                    winston.verbose(`set classroom for ${sectionsObj.name} as ${lectureHall}`);
                     if (curSeats > 0) {
                         roomInfo[curLocation] += curSeats;
-                        winston.verbose('%s has no discussions, add %d lecture only seats', sectionsObj['name'], curSeats);
+                        winston.verbose(`${sectionsObj.name} has no discussions, add ${curSeats} lecture only seats`);
                     }
                 } else if (curType == "discussion") {
                     roomInfo[curLocation] += curSeats;
-                    winston.verbose('new discussion for %s with %d seats at %s', sectionsObj['name'], curSeats, curLocation);
+                    winston.verbose(`new discussion for ${sectionsObj.name} with ${curSeats} seats at ${curLocation}`)
                     if (lectureHall) {
                         roomInfo[lectureHall] += curSeats;
                         lectureSeats += curSeats;
@@ -72,21 +73,26 @@ io.on('connection', function(socket) {
         winston.info('sections loaded, load csv');
         delete roomInfo['TBA'];
 
-        coordinatesData = {};
+        let coordinatesData = {};
 
         fs.createReadStream('coordinates.csv')
             .pipe(csv())
-            .on('data', function(data) {
+            .on('data', data => {
                 coordinatesData[data.room] = [data.x, data.y];
             })
-            .on('end', function() {
+            .on('end', () => {
                 winston.info('emit data');
                 io.emit('locations', [coordinatesData, roomInfo]);
             });
 
-    }).catch(function(err) {
-        winston.error('socjs error: ' + err);
+    }).catch(error => {
+        winston.error(`socjs error: ${error}`);
+        io.emit('serverupdate', 'socjs error. Try again.');
     });
 });
 
-http.listen(serverPort, serverUrl);
+http.listen(serverPort, serverUrl, error => {
+  if (error) {
+    winston.error(`connection error: ${error}`);
+  }
+});

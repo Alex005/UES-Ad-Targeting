@@ -1,20 +1,21 @@
-var socket = io();
-var canvas = {};
-var roomCoordinates = {};
-var winHeight = 0;
-var statusBar = {};
+"use strict";
+const socket = io();
+let canvas = {};
+let roomCoordinates = {};
+let winHeight = 0;
+let statusBar = {};
 
 window.onload = function() {
     winHeight = window.innerHeight;
-    var minRadius = 5;
-    var maxRadius = 50;
+    const minRadius = 5;
+    const maxRadius = 50;
 
     statusBar = document.getElementsByClassName('status')[0];
-    wrapper = document.getElementById('heatmapContainerWrapper');
+    let wrapper = document.getElementById('heatmapContainerWrapper');
 
     updateStatus("Initial page loaded");
 
-    var heatmap = h337.create({
+    const heatmap = h337.create({
         maxOpacity: .75,
         container: document.getElementById('heatmapContainer')
     });
@@ -25,19 +26,19 @@ window.onload = function() {
 
     updateStatus("Document set up. Waiting for data...");
 
-    socket.on('locations', function(data) {
+    socket.on('locations', data => {
         updateStatus("Data received. Analyzing...");
         roomCoordinates = data[0];
-        var roomInfo = data[1];
-        var valExtract = Object.keys(roomInfo).map(function(key) {
+        let roomInfo = data[1];
+        const valExtract = Object.keys(roomInfo).map(key => {
             return roomInfo[key];
         });
-        var maxStudents = Math.max.apply(null, valExtract);
-        points = [];
+        const maxStudents = Math.max.apply(null, valExtract);
+        let points = [];
         for (var room in roomInfo) {
             if (roomInfo.hasOwnProperty(room)) {
                 if (!roomCoordinates.hasOwnProperty(room)) {
-                    console.log(room + ' does not have any coordinates');
+                    console.log(`${room} does not have any coordinates`);
                 }
 
                 points.push({
@@ -47,37 +48,34 @@ window.onload = function() {
                     radius: minRadius + (maxRadius - minRadius) * (roomInfo[room] / maxStudents)
                 });
 
-                var pTag = document.createElement("P");
-                var innerText = document.createTextNode(room + ' - ' + roomInfo[room]);
+                let pTag = document.createElement("P");
+                let innerText = document.createTextNode(room + ' - ' + roomInfo[room]);
                 pTag.appendChild(innerText);
 
                 document.getElementById("classes").appendChild(pTag);
             }
         }
-
-        var data = {
+        heatmap.setData({
             max: maxStudents,
             data: points
-        };
-        console.log(heatmap, data);
-        heatmap.setData(data);
+        });
         updateStatus("Document ready!");
         canvas.addEventListener("click", findClosestRoom, false);
     });
-    socket.on('serverupdate', function(message) {
+    socket.on('serverupdate', message => {
         updateStatus(message);
     });
 };
 
 function findClosestRoom(event) {
-    var distances = distFormula(event.pageX / winHeight, event.pageY / winHeight);
+    const distances = distFormula(event.pageX / winHeight, event.pageY / winHeight);
 
     if (distances.length == 0) {
         document.getElementById('label').innerHTML = "Unknown";
     } else {
-        var selectLocation = distances[0][0];
-        var minimum = distances[0][1];
-        distances.forEach(function(distance) {
+        let selectLocation = distances[0][0];
+        let minimum = distances[0][1];
+        distances.forEach(distance => {
             if (distance[1] < minimum) {
                 minimum = distance[1];
                 selectLocation = distance[0];
@@ -88,13 +86,13 @@ function findClosestRoom(event) {
 }
 
 function distFormula(x, y) {
-    var distances = [];
-    var clickReach = 0.001;
+    let distances = [];
+    const clickReach = 0.03;
 
-    for (var room in roomCoordinates) {
-        var rawDistance = Math.pow((roomCoordinates[room][0] - x), 2) + Math.pow((roomCoordinates[room][1] - y), 2);
-        if (rawDistance < clickReach) {
-            distances.push([room, rawDistance]);
+    for (let room in roomCoordinates) {
+        let distance = Math.hypot(roomCoordinates[room][0] - x,roomCoordinates[room][1] - y);
+        if (distance < clickReach) {
+            distances.push([room, distance]);
         }
     }
     return distances;
