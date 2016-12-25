@@ -1,13 +1,18 @@
 var socket = io();
 var canvas = {};
 var roomCoordinates = {};
+var winHeight = 0;
+var statusBar = {};
 
 window.onload = function() {
-    var winHeight = window.innerHeight;
+    winHeight = window.innerHeight;
     var minRadius = 5;
     var maxRadius = 50;
 
+    statusBar = document.getElementsByClassName('status')[0];
     wrapper = document.getElementById('heatmapContainerWrapper');
+
+    updateStatus("Initial page loaded");
 
     var heatmap = h337.create({
         maxOpacity: .75,
@@ -18,9 +23,12 @@ window.onload = function() {
     canvas.height = winHeight;
     window.h = heatmap;
 
+    updateStatus("Document set up. Waiting for data...");
+
     socket.on('locations', function(data) {
-      roomCoordinates = data[0];
-      var roomInfo = data[1];
+        updateStatus("Data received. Analyzing...");
+        roomCoordinates = data[0];
+        var roomInfo = data[1];
         var valExtract = Object.keys(roomInfo).map(function(key) {
             return roomInfo[key];
         });
@@ -33,7 +41,7 @@ window.onload = function() {
                 }
 
                 points.push({
-                    x: Math.floor(roomCoordinates[room][0] * (winHeight+5)),
+                    x: Math.floor(roomCoordinates[room][0] * (winHeight + 5)),
                     y: Math.floor(roomCoordinates[room][1] * winHeight),
                     value: roomInfo[room],
                     radius: minRadius + (maxRadius - minRadius) * (roomInfo[room] / maxStudents)
@@ -51,13 +59,18 @@ window.onload = function() {
             max: maxStudents,
             data: points
         };
+        console.log(heatmap, data);
         heatmap.setData(data);
-        canvas.addEventListener("mouseup", findClosestRoom, false);
+        updateStatus("Document ready!");
+        canvas.addEventListener("click", findClosestRoom, false);
+    });
+    socket.on('serverupdate', function(message) {
+        updateStatus(message);
     });
 };
 
 function findClosestRoom(event) {
-    var distances = distFormula(event.clientX, event.clientY);
+    var distances = distFormula(event.pageX / winHeight, event.pageY / winHeight);
 
     if (distances.length == 0) {
         document.getElementById('label').innerHTML = "Unknown";
@@ -76,7 +89,7 @@ function findClosestRoom(event) {
 
 function distFormula(x, y) {
     var distances = [];
-    var clickReach = 750;
+    var clickReach = 0.001;
 
     for (var room in roomCoordinates) {
         var rawDistance = Math.pow((roomCoordinates[room][0] - x), 2) + Math.pow((roomCoordinates[room][1] - y), 2);
@@ -85,4 +98,8 @@ function distFormula(x, y) {
         }
     }
     return distances;
+}
+
+function updateStatus(message) {
+    statusBar.innerHTML = message;
 }

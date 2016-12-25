@@ -11,51 +11,68 @@
                 margin: 0;
                 padding: 0;
                 height: 100%;
+                font-family: 'Helvetica', 'sans-serif';
+                color: darkslategray;
             }
 
-            #label,
-            #classes {
-                position: absolute;
-                width: 200px;
-                right: 200px;
-            }
-
-            #label {
-                top: 50px;
-            }
-
-            #classes {
-                top: 100px;
+            .container {
+                width: 100%;
+                display: flex;
+                flex-flow: row wrap;
             }
 
             #heatmapContainerWrapper {
+                flex: none;
                 background-image: url(CampusMap.png);
                 background-size: contain;
                 background-repeat: no-repeat;
                 height: 100%;
-                margin: 0;
             }
 
             #heatmapContainer {
+                position: absolute;
                 width: 100%;
                 height: 100%;
-                margin: 0;
             }
 
             .heatmap-canvas {
                 position: relative !important;
             }
+
+            .sidebar {
+                flex: auto;
+                padding: 50px;
+                box-shadow: 0 0 10px 0 silver inset;
+                overflow-y: scroll;
+            }
+
+            .sidebar h2 {
+                color: lightslategray;
+            }
+
+            .status {
+                flex: auto;
+                background-color: seagreen;
+                color: honeydew;
+                border-radius: 3px;
+                border-bottom: 3px solid darkgreen;
+                padding: 10px;
+            }
         </style>
     </head>
 
     <body>
-        <div id="heatmapContainerWrapper">
-            <div id="heatmapContainer">
-
+        <div class="container">
+            <div id="heatmapContainerWrapper">
+                <div id="heatmapContainer">
+                </div>
+            </div>
+            <div class="sidebar">
+                <div class="status"></div>
+                <h2 id="label">Unknown</h2>
+                <div id="classes"></div>
             </div>
         </div>
-        <h2 id="label">Unknown</h2>
-        <div id="classes"></div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.min.js"></script>
         <script src="lib/heatmap.js-2.0.5/build/heatmap.min.js"></script>
         <script src="main.js"></script>
