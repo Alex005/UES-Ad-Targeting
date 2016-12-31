@@ -35,7 +35,7 @@ io.on('connection', socket => {
 
     socsjs.searchDepartment(quarter, dept, timeout, true).then(departmentResults => {
 
-        winston.info('search deptartment');
+        winston.info('search department');
 
         departmentResults.forEach(sectionsObj => {
             let lectureHall = null;
