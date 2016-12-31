@@ -11,7 +11,8 @@ window.onload = function() {
     const maxRadius = 50;
 
     statusBar = document.getElementsByClassName('status')[0];
-    let wrapper = document.getElementById('heatmapContainerWrapper');
+    let sidebar = document.getElementsByClassName('sidebar')[0];
+    sidebar.style.width = "calc(100% - " + winHeight + "px - 100px)";
 
     updateStatus("Initial page loaded");
 

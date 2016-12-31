@@ -1,0 +1,46 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Helvetica', 'sans-serif';
+    color: darkslategray;
+}
+
+#heatmapContainerWrapper {
+    position: fixed;
+    background-image: url(CampusMap.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 100%;
+}
+
+#heatmapContainer {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+}
+
+.heatmap-canvas {
+    position: relative !important;
+}
+
+.sidebar {
+    position: absolute;
+    padding: 50px;
+    box-shadow: 0 0 10px 0 silver inset;
+    right: 0;
+    min-height: calc(100% - 100px);
+}
+
+.sidebar h2 {
+    color: lightslategray;
+}
+
+.status {
+    flex: auto;
+    background-color: seagreen;
+    color: honeydew;
+    border-radius: 3px;
+    border-bottom: 3px solid darkgreen;
+    padding: 10px;
+}
