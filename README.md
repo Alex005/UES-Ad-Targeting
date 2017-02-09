@@ -27,6 +27,8 @@ Built by myself ([@alex005](https://github.com/Alex005))
 - [x] Clean coordinates and add more buildings
 - [x] Append student num to the clicked building
 - [ ] Click should prioritize the most student filled building
+- [ ] Make weekly numbers more accessible
+- [ ] Label each classroom as primarily discussion or lecture
 
 ## License
 
