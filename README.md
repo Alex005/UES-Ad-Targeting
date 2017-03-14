@@ -26,9 +26,11 @@ Built by myself ([@alex005](https://github.com/Alex005))
 - [x] Migrate location coordinates into a separate file
 - [x] Clean coordinates and add more buildings
 - [x] Append student num to the clicked building
+- [x] Include weekly lecture/discussion repetition in student sum
 - [ ] Click should prioritize the most student filled building
-- [ ] Make weekly numbers more accessible
+- [x] Make weekly numbers more accessible
 - [ ] Label each classroom as primarily discussion or lecture
+- [ ] Give a number of flyers needed for top 3 rooms
 
 ## License
 
