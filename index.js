@@ -9,7 +9,7 @@ const fs = require('fs');
 const winston = require('winston');
 
 winston.configure({
-    level: 'error',
+    level: 'verbose',
     transports: [
         new(winston.transports.File)({
             filename: 'UESAT_logs.log'
@@ -40,8 +40,10 @@ io.on('connection', socket => {
         departmentResults.forEach(sectionsObj => {
             let lectureHall = null;
             let lectureSeats = 0;
+            let lectureDays = 0;
 
             sectionsObj.sections.forEach(section => {
+
                 let curLocation = section.location;
                 let curSeats = section.seatLimit - section.openSeats + section.waitlistSize;
                 let curType = section.type;
@@ -52,7 +54,8 @@ io.on('connection', socket => {
                 }
                 if (curType == "lecture") {
                     lectureHall = curLocation;
-                    winston.verbose(`set classroom for ${sectionsObj.name} as ${lectureHall}`);
+                    lectureDays = int(section.days.replace(/[^A-Z]/g, '').length);
+                    winston.verbose(`set classroom for ${sectionsObj.name} as ${lectureHall} held on ${lectureDays}`);
                     if (curSeats > 0) {
                         roomInfo[curLocation] += curSeats;
                         winston.verbose(`${sectionsObj.name} has no discussions, add ${curSeats} lecture only seats`);
@@ -61,7 +64,7 @@ io.on('connection', socket => {
                     roomInfo[curLocation] += curSeats;
                     winston.verbose(`new discussion for ${sectionsObj.name} with ${curSeats} seats at ${curLocation}`)
                     if (lectureHall) {
-                        roomInfo[lectureHall] += curSeats;
+                        roomInfo[lectureHall] += (curSeats);
                         lectureSeats += curSeats;
                     }
                 } else if (curType == "final") {
@@ -75,10 +78,10 @@ io.on('connection', socket => {
 
         let coordinatesData = {};
 
-        fs.createReadStream('coordinates.csv')
+        fs.createReadStream('classrooms.csv')
             .pipe(csv())
             .on('data', data => {
-                coordinatesData[data.room] = [data.x, data.y];
+                coordinatesData[data.code] = [data.x, data.y];
             })
             .on('end', () => {
                 winston.info('emit data');
