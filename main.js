@@ -64,13 +64,16 @@ window.onload = function() {
 };
 
 function findClosestRoom(event) {
-    const distances = distFormula(event.clientX / winHeight, event.clientY / winHeight);
+    const mouseX = event.clientX / winHeight;
+    const mouseY = event.clientY / winHeight;
+    const distances = distFormula(mouseX, mouseY);
 
     if (distances.length == 0) {
         document.getElementById('label').innerHTML = "Unknown";
     } else {
         let selectLocation = distances[0][0];
         let minimum = distances[0][1];
+
         distances.forEach(distance => {
             if (distance[1] < minimum) {
                 minimum = distance[1];
@@ -78,9 +81,9 @@ function findClosestRoom(event) {
             }
         });
         document.getElementById('label').innerHTML = selectLocation + ' - ' + roomInfo.find((elm) => {
-          if (elm[0] == selectLocation) {
-            return elm;
-          }
+            if (elm[0] == selectLocation) {
+                return elm;
+            }
         })[1];
     }
 }
@@ -110,7 +113,7 @@ function sortProperties(obj) {
         if (obj.hasOwnProperty(key))
             sortable.push([key, obj[key]]); // each item is an array in format [key, value]
 
-        // sort items by value
+    // sort items by value
     sortable.sort((a, b) => {
         return b[1] - a[1]; // compare numbers
     });
