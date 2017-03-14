@@ -54,17 +54,17 @@ io.on('connection', socket => {
                 }
                 if (curType == "lecture") {
                     lectureHall = curLocation;
-                    lectureDays = int(section.days.replace(/[^A-Z]/g, '').length);
+                    lectureDays = parseInt(section.days.replace(/[^A-Z]/g, '').length);
                     winston.verbose(`set classroom for ${sectionsObj.name} as ${lectureHall} held on ${lectureDays}`);
                     if (curSeats > 0) {
-                        roomInfo[curLocation] += curSeats;
+                        roomInfo[curLocation] += (curSeats*lectureDays);
                         winston.verbose(`${sectionsObj.name} has no discussions, add ${curSeats} lecture only seats`);
                     }
                 } else if (curType == "discussion") {
                     roomInfo[curLocation] += curSeats;
                     winston.verbose(`new discussion for ${sectionsObj.name} with ${curSeats} seats at ${curLocation}`)
                     if (lectureHall) {
-                        roomInfo[lectureHall] += (curSeats);
+                        roomInfo[lectureHall] += (curSeats*lectureDays);
                         lectureSeats += curSeats;
                     }
                 } else if (curType == "final") {
