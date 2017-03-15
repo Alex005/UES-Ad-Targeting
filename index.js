@@ -9,7 +9,7 @@ const fs = require('fs');
 const winston = require('winston');
 
 winston.configure({
-    level: 'verbose',
+    level: 'error',
     transports: [
         new(winston.transports.File)({
             filename: 'UESAT_logs.log'
