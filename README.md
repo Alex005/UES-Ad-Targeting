@@ -1,4 +1,4 @@
-## UCSD Undergraduate Economics Society Advertisement Targetting
+## UCSD Undergraduate Economics Society Advertisement Targeting
 
 This small Node.js application was created with the intent of improving UCSD Undergraduate Economics Society's (UES) marketing and advertising. The marketing committee was previously approaching advertising and flyering without data or reason to support their methodology. Hopefully, this application will reduce inefficiency and waste, and increase the effectiveness of the team's efforts.
 
