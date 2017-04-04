@@ -81,7 +81,7 @@ io.on('connection', socket => {
         fs.createReadStream('classrooms.csv')
             .pipe(csv())
             .on('data', data => {
-                coordinatesData[data.code] = [data.x, data.y];
+                coordinatesData[data.code] = [data.x, data.y, data.name, data.room, data.capacity];
             })
             .on('end', () => {
                 winston.info('emit data');

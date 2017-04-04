@@ -16,6 +16,8 @@ window.onload = function() {
 
     updateStatus("Initial page loaded");
 
+    // Create heatmap elements
+
     const heatmap = h337.create({
         maxOpacity: .75,
         container: document.getElementById('heatmapContainer')
@@ -26,6 +28,8 @@ window.onload = function() {
     window.h = heatmap;
 
     updateStatus("Document set up. Waiting for data...");
+
+    // Load data from index.js
 
     socket.on('locations', data => {
         updateStatus("Data received. Analyzing...");
@@ -38,15 +42,17 @@ window.onload = function() {
             if (!roomCoordinates.hasOwnProperty(room[0]))
                 console.log(`${room[0]} does not have any coordinates`);
 
+            let curLocation = roomCoordinates[room[0]];
+
             points.push({
-                x: Math.floor(roomCoordinates[room[0]][0] * (winHeight + 5)),
-                y: Math.floor(roomCoordinates[room[0]][1] * winHeight),
+                x: Math.floor(curLocation[0] * (winHeight + 5)),
+                y: Math.floor(curLocation[1] * winHeight),
                 value: room[1],
                 radius: minRadius + (maxRadius - minRadius) * (room[1] / maxStudents)
             });
 
             let pTag = document.createElement("P");
-            let innerText = document.createTextNode(room[0] + ' - ' + room[1]);
+            let innerText = document.createTextNode(curLocation[2] + ' ' + curLocation[3] + ' - ' + room[1] + ' - Flyers: ' + parseInt(curLocation[4])/2);
             pTag.appendChild(innerText);
 
             document.getElementById("classes").appendChild(pTag);
@@ -71,8 +77,8 @@ function findClosestRoom(event) {
     if (distances.length == 0) {
         document.getElementById('label').innerHTML = "Unknown";
     } else {
-        let selectLocation = distances[0][0];
-        let minimum = distances[0][1];
+      let selectLocation = distances[0][0];
+      let minimum = distances[0][1];
 
         distances.forEach(distance => {
             if (distance[1] < minimum) {
@@ -80,11 +86,12 @@ function findClosestRoom(event) {
                 selectLocation = distance[0];
             }
         });
-        document.getElementById('label').innerHTML = selectLocation + ' - ' + roomInfo.find((elm) => {
+        selectStudents = roomInfo.find((elm) => {
             if (elm[0] == selectLocation) {
                 return elm;
             }
         })[1];
+        document.getElementById('label').innerHTML = selectLocation + ' - ' + selectStudents + ' - Flyers: ';
     }
 }
 

@@ -30,6 +30,7 @@ Built by myself ([@alex005](https://github.com/Alex005))
 - [x] Make weekly numbers more accessible
 - [ ] Label each classroom as primarily discussion or lecture
 - [ ] Give a number of flyers needed for top 3 rooms
+- [ ] Assign a letter grade to classrooms based on potential
 
 ## License
 
