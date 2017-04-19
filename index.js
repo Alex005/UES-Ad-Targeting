@@ -20,7 +20,7 @@ winston.configure({
 const serverPort = 8000;
 const serverUrl = "127.0.0.1";
 
-const quarter = 'WI17';
+const quarter = 'SP17';
 const dept = 'ECON';
 const timeout = 5000;
 
